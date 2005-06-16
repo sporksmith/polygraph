@@ -1,9 +1,0 @@
-DONE change defaults for 'bound' clustering method
-
-DONE make '5' a parameter for fpos estimation in clustering
-
-SKIP refactor bayes to be a factory?
-
-DONE remove pairs
-
-SKIP make max acceptable false positives a fraction

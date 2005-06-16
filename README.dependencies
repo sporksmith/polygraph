@@ -1,3 +1,6 @@
+**************************************************************************
+The following are required to build and run Polygraph:
+**************************************************************************
 libstree: suffix tree library
 version 0.4.0
 Author: Christian Kreibich <christian@whoop.org>
@@ -17,6 +20,9 @@ Author:
 License: BSD
 http://sourceforge.net/projects/pylibpcap/
 
+**************************************************************************
+These are polymorphic engines used in some of the included experiments.
+**************************************************************************
 clet: polymorphic engine
 version 1.0.0
 http://www.phrack.org/show.php?p=61&a=9
@@ -25,6 +31,10 @@ admmutate: polymorphic engine
 version 0.8.4
 http://www.ktwo.ca/c/
 
+**************************************************************************
+These are used to produce graphs of the hierarchical clustering,
+and are not strictly necessary.
+**************************************************************************
 pydot: python interface to dot
 version 0.9.9
 Author: Ero Carrera <ero@dkbza.org>

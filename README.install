@@ -4,3 +4,50 @@ preprocess traces (reconstruct_streams, mksary)
 generate workloads (experiments/workloads/generate_workloads)
 edit config.py (?)
 
+Step 1: Install dependencies
+Make and install dependencies (see README.dependencies).
+NOTE: you must patch libstree using libstree-annotation.diff
+
+Step 2: Install Polygraph code
+From the polygraph subdirectory, run 'python setup.py'. Optionally,
+use --home=installdir to specify where to install.
+
+The next steps are to run the experiments in the included test bed. You can
+skip these steps if you don't want to run these particular experiments, though
+it could be useful to get an idea of how to use the polygraph code.
+
+Step 3: Acquire and preprocess traces
+Polygraph uses traces of innocuous traffic during signature generation to help 
+estimate how likely tokens are to appear in innocuous streams, to estimate 
+the overall false positive rate of generated signatures, and to set the
+threshold in bayes signatures. The test bed uses additional traces to
+measure the false positive rate of generated signatures.
+
+To run the experiments in the included test bed, you will need four traces:
+Two traces of port 53 (DNS), and two traces of port 80 (HTTP). One trace
+for each port will be used for training, and the other for evaluation.
+Due to privacy concerns, we are not able to distribute the traces we used
+to generate our published results. Sample, toy traces are included in
+experiments/traces/, but these should NOT be used for real experiments. 
+They may be used to verify that the Polygraph code and test bed are installed
+and running correctly.
+
+Once you have acquired the appropriate traces, they must be converted to
+'streamfiles', which consist of the reconstructed network streams. To build
+a streamfile, run:
+reconstruct_streams [--nosary] outname pcapfile1 [pcapfile2] [pcapfile3]... 
+
+By default, this will will build a streamfile called 'outname' out of the
+specified pcap trace files, and build a suffix array to allow them to be
+efficiently searched. The suffix arrays are required for streamfiles used
+for training, but are not necessary for evaluation traces. Note that in
+the current implementation, network streams that span multiple pcap files
+will be broken into separate streams in the resulting streamfile.
+
+Step 4: Generate workloads
+The next step is to generate the polymorphic worm workloads. This can be
+done simply by running experiments/workloads/generate_workloads.py
+
+Step 5: Configuration
+Edit experiments/config.py to specify where the streamfiles and workloads
+are located.

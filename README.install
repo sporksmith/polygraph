@@ -1,0 +1,6 @@
+make & install dependencies (patching libstree)
+run setup.py
+preprocess traces (reconstruct_streams, mksary)
+generate workloads (experiments/workloads/generate_workloads)
+edit config.py (?)
+

@@ -1,0 +1,3 @@
+Change tokentree to get linear time bound, and change bayes to use it.
+
+Change common substrings algorithm to get linear time bound

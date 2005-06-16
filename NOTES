@@ -1,0 +1,17 @@
+Fixed bug in lcseq that effectively caused gap penalty to be rounded up to
+nearest integer. This means in our published results, our gap penalty
+was effectively 1.0
+
+lcseq_tree- use_fixed_gaps is not in a working state.
+
+current noise workloads are generated using samples from eval traces.
+better practice may be to remove the samples being used for noise from the
+eval traces.
+
+when reconstructing streams, streams not allowed to continue from one
+trace to another.
+
+discuss bound_similarity issues.
+(mostly right for conjunction, could be attacked for subseq)
+
+Reason for max (5) tokens in fp estimate

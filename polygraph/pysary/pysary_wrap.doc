@@ -1,0 +1,74 @@
+pysary_wrap.c
+
+[ Python Module : pysary ]
+
+
+saryer_new(file_name)
+        [ returns Saryer * ]
+
+saryer_new2(file_name,array_name)
+        [ returns Saryer * ]
+
+saryer_destroy(saryer)
+        [ returns void  ]
+
+saryer_search(saryer,pattern)
+        [ returns gboolean  ]
+
+saryer_search2(saryer,pattern,len)
+        [ returns gboolean  ]
+
+saryer_isearch(saryer,pattern,len)
+        [ returns gboolean  ]
+
+saryer_isearch_reset(saryer)
+        [ returns void  ]
+
+saryer_icase_search(saryer,pattern)
+        [ returns gboolean  ]
+
+saryer_icase_search2(saryer,pattern,len)
+        [ returns gboolean  ]
+
+saryer_get_text(saryer)
+        [ returns SaryText * ]
+
+saryer_get_array(saryer)
+        [ returns SaryMmap * ]
+
+saryer_get_next_offset(saryer)
+        [ returns SaryInt  ]
+
+saryer_get_next_line(saryer)
+        [ returns gchar * ]
+
+saryer_get_next_line2(saryer,len)
+        [ returns gchar * ]
+
+saryer_get_next_context_lines(saryer,backward,forward)
+        [ returns gchar * ]
+
+saryer_get_next_context_lines2(saryer,backward,forward,len)
+        [ returns gchar * ]
+
+saryer_get_next_tagged_region(saryer,start_tag,end_tag)
+        [ returns gchar * ]
+
+saryer_get_next_tagged_region2(saryer,start_tag,start_tag_len,end_tag,end_tag_len,len)
+        [ returns gchar * ]
+
+saryer_get_next_occurrence(saryer)
+        [ returns SaryText * ]
+
+saryer_peek_next_position(saryer)
+        [ returns gchar * ]
+
+saryer_count_occurrences(saryer)
+        [ returns SaryInt  ]
+
+saryer_sort_occurrences(saryer)
+        [ returns void  ]
+
+saryer_enable_cache(saryer)
+        [ returns void  ]
+

@@ -1,0 +1,4 @@
+Modified the swig-generated wrapper by hand, changing the args of 
+saryer_search2 to ss# instead of ssi, so that it will accept strings 
+containing null bytes.
+

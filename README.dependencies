@@ -1,0 +1,38 @@
+libstree: suffix tree library
+version 0.4.0
+Author: Christian Kreibich <christian@whoop.org>
+License: BSD style
+http://www.cl.cam.ac.uk/~cpk25/libstree/index.html
+*NOTE: you need to apply the included patch!*
+
+sary: suffix array library
+version 1.0.4
+Author: Satoru Takabayashi
+License: LGPL 
+http://sary.sourceforge.net/
+
+pylibpcap: python bindings for libpcap
+version 0.4
+Author: 
+License: BSD
+http://sourceforge.net/projects/pylibpcap/
+
+clet: polymorphic engine
+version 1.0.0
+http://www.phrack.org/show.php?p=61&a=9
+
+admmutate: polymorphic engine
+version 0.8.4
+http://www.ktwo.ca/c/
+
+pydot: python interface to dot
+version 0.9.9
+Author: Ero Carrera <ero@dkbza.org>
+License: MIT
+http://dkbza.org/pydot.html
+
+graphviz: visualization (dot)
+version: 1.12
+Author: 
+License: CPL 1.0
+http://www.graphviz.org/

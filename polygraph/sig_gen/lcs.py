@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+#      Polygraph (release 0.1)
+#      Signature generation algorithms for polymorphic worms
+#
+#      Copyright (c) 2004-2005, Intel Corporation
+#      All Rights Reserved
+#
+#  This software is distributed under the terms of the Eclipse Public
+#  License, Version 1.0 which can be found in the file named LICENSE.
+#  ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS SOFTWARE CONSTITUTES
+#  RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT
 
 import sig_gen
 import sys
@@ -22,30 +32,13 @@ class LCS(sig_gen.SigGen):
     def train(self, pos_samples):
         self.sig = ""
 
-        # switched to suffix tree implementation
+        # find longest common substring
         st = sutil.STree(pos_samples)
-#        strings = st.common_sub(2, max(int(len(pos_samples)*3/4), 2)).keys()
-        strings = st.common_sub(2, len(pos_samples), 2).keys()
+        strings = st.common_sub(2, len(pos_samples), prune=False).keys()
         strings.sort(lambda x,y: cmp(len(y), len(x)))
         if len(strings) > 0:
             self.sig = strings[0]
         return [self]
-
-        # CURRENTLY UNUSED
-        # iterate from longest to shortest substrings.
-        for sub_len in xrange(min(self.maxlen, len(pos_samples[0])), 1, -1):
-            for start in xrange(len(pos_samples[0]) - sub_len + 1):
-                sub = pos_samples[0][start:start+sub_len]
-
-                # see if sub occurs in all other samples
-                for sample in pos_samples[1:]:
-                    if sample.find(sub) < 0:
-                        break
-                else:
-                    # OK, use this one
-                    self.sig = sub
-                    print "LCS: " + self.sig_str()
-                    return
 
     def match(self, sample):
         return sample.find(self.sig) >= 0

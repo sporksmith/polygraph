@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+#      Polygraph (release 0.1)
+#      Signature generation algorithms for polymorphic worms
+#
+#      Copyright (c) 2004-2005, Intel Corporation
+#      All Rights Reserved
+#
+#  This software is distributed under the terms of the Eclipse Public
+#  License, Version 1.0 which can be found in the file named LICENSE.
+#  ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS SOFTWARE CONSTITUTES
+#  RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT
 
 from __future__ import division
 import math
@@ -9,6 +19,28 @@ import polygraph.util.sutil as sutil
 import sets
 import polygraph.sigprob.sigprob as sigprob
 import pickle
+
+def _float_eps(x):
+    """
+    Return roughly the smallest amt that x can be meaningfully 
+    incremented\decremented. Probably there's a closed-form formula for this,
+    but this way should be portable in case of different floating point
+    representations...
+    """
+    eps = 1.0
+    if (x + eps) == x or (x - eps) == x:
+        # 1.0 is too small, find eps just big enough
+        while (x + eps) == x or (x - eps) == x:
+            eps *= 2.0
+    else:
+        # 1.0 is too large, find eps just small enough
+        last_eps = 1.0
+        eps = 0.5
+        while (x + eps) != x and (x - eps) != x:
+            last_eps = eps
+            eps /= 2.0
+        eps = last_eps
+    return eps 
 
 class Bayes(sig_gen.SigGen):
     fpos_rate = {}
@@ -75,7 +107,10 @@ class Bayes(sig_gen.SigGen):
             self.threshold = min(sample_scores)
         elif self.threshold_style == 'bound':
             # use threshold that results in sufficiently low false positives
-            self.get_bound_threshold(pos_samples)
+            self.get_bound_threshold(pos_samples, aggressiveness=0.0)
+        elif self.threshold_style == 'bound_aggressive':
+            # use threshold that results in sufficiently low false positives.
+            self.get_bound_threshold(pos_samples, aggressiveness=0.5)
         else:
             # use a user-specified threshold.
             # This is an approximation of the 'bound' threshold style.
@@ -83,9 +118,19 @@ class Bayes(sig_gen.SigGen):
             # can be calculated.
             self.threshold = self.threshold_style
 
-    def get_bound_threshold(self, pos_samples):
+    def get_bound_threshold(self, pos_samples, aggressiveness=0.0):
+        """
+        Sets signature threshold to achieve no more than max acceptable
+        false positives in training innocuous pool. aggressiveness should
+        be set in range [0.0, 1.0]. aggressiveness > 0.0 can reduce false
+        positives, but risks overtraining attacks.
+        """
         top_neg_scores = []
 
+        assert(aggressiveness >= 0.0 and aggressiveness <= 1.0)
+
+        # Find Tmin, the threshold that achieves no more than the max
+        # acceptable false positive rate.
         import polygraph.trace_crunching.stream_trace as stream_trace
         trace = stream_trace.StreamTrace(self.training_trace)
         sample = trace.next()
@@ -98,9 +143,13 @@ class Bayes(sig_gen.SigGen):
                     del top_neg_scores[0]
             sample = trace.next()
         Tmin = top_neg_scores[0]
+        Tmin += _float_eps(Tmin)
+
 #        print 'Top negative scores: ', top_neg_scores
 #        print 'Tmin: ', Tmin
 
+        # Find Tmax, the highest threshold > Tmin that will not change the
+        # classification of any samples in the suspicious pool.
         sample_scores = []
         for s in pos_samples:
             sample_scores.append(self.score(s))
@@ -111,19 +160,21 @@ class Bayes(sig_gen.SigGen):
                 Tmax = score
                 break
         else:
-            print "Can't satisfy threshold constraints!"
-            self.threshold = Tmin
-            return
+            print "Warning- no samples in suspicious pool match"
+            Tmax = Tmin
 
-#        print 'Tmax: ', Tmax
-        fraction = (Tmax-Tmin)*.5
-        self.threshold = Tmin+fraction
+        # Set the threshold in the range [Tmin, Tmax]
+        # Thresholds higher than Tmin risks overtraining attacks, but can 
+        # reduce false positives.
+        self.threshold = Tmax * aggressiveness + Tmin * (1.0 - aggressiveness)
 
     def score(self, sample):
         sample_score = 0
         sample_tokens = self.get_sample_occurrences(sample, False, False) 
 
-        sample_score = -math.log(.5)/math.log(10)
+        # XXX: Use this to match actual Bayes formula. Doesn't affect
+        # behavior at all, though, and makes threshold harder to interpret.
+#        sample_score = -math.log(.5)/math.log(10)
 
         for token in self.token_scores:
             if sample_tokens.has_key(token):

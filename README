@@ -1,0 +1,73 @@
+/*
+ *      Polygraph (release 0.1)
+ *      Signature generation algorithms for polymorphic worms
+ *
+ *      Copyright (c) 2004-2005, Intel Corporation
+ *      All Rights Reserved
+ *
+ *  This software is distributed under the terms of the Eclipse Public
+ *  License, Version 1.0 which can be found in the file named LICENSE.
+ *  ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS SOFTWARE CONSTITUTES
+ *  RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT
+ */
+
+This software is a test harness for the algorithms and techniques described in:
+``Polygraph: Automatically generating signatures for polymorphic worms'' 
+
+Citation:
+James Newsome, Brad Karp, and Dawn Song. Polygraph: Automatically generating signatures for polymorphic worms. In Proceedings of the IEEE Symposium on Security and Privacy, May 2005.
+
+The included software can be used to verify our results, and experiment
+with variations of our techniques. It is NOT intended to be used as a
+production system for generating worm signatures. 
+
+This software has been tested on Redhat 9.3, using Python 2.3.4. We are
+unable to provide help on running this software in other environments.
+
+This software was written by James Newsome (jnewsome@ece.cmu.edu), in 
+collaboration with Brad Karp (brad.n.karp@intel.com) and 
+Dawn Song (dawnsong@cmu.edu).
+
+***************************************************************************
+NOTES
+***************************************************************************
+Fixed bug in lcseq that effectively caused gap penalty to be rounded up to
+nearest integer. This means in our published results, our gap penalty
+was effectively 1.0
+
+discuss bound_similarity issues.
+(mostly right for conjunction, could be attacked for subseq)
+
+Reason for max (5) tokens in fp estimate
+
+***************************************************************************
+Known Issues
+***************************************************************************
+lcseq_tree- use_fixed_gaps is not in a working state.
+
+when reconstructing streams, streams not allowed to continue from one
+trace to another.
+
+current noise workloads are generated using samples from eval traces.
+better practice may be to remove the samples being used for noise from the
+eval traces.
+
+
+***************************************************************************
+Suggested Extensions
+***************************************************************************
+
+***************************************************************************
+Performance Improvements
+***************************************************************************
+Implement linear-time algorithm for finding what tokens are present in a
+string. Suffix tree algorithm is implemented in polygraph/sutil/sutilc.c
+(stree_find_tokens), but it is not currently being used, because naive
+implementation is faster in practice. See Gusfield for how to achieve
+linear time bound in the suffix tree implementation.
+
+Implement linear-time algorithm for finding common substrings, as described
+in Gusfield, chapter 9. Current implementation is O(Kn) time, where K is the
+number of strings, and n is the total length of the strings. This doesn't
+seem to be a major bottleneck though.
+

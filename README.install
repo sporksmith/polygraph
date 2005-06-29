@@ -11,11 +11,8 @@
  *  RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT
  */
 
-make & install dependencies (patching libstree)
-run setup.py
-preprocess traces (reconstruct_streams, mksary)
-generate workloads (experiments/workloads/generate_workloads)
-edit config.py (?)
+The following steps are to install the Polygraph code, and to run the
+included experiments. 
 
 Step 1: Install dependencies
 Make and install dependencies (see README.dependencies).
@@ -64,3 +61,24 @@ done simply by running experiments/workloads/generate_workloads.py
 Step 5: Configuration
 Edit experiments/config.py to specify where the streamfiles and workloads
 are located.
+
+Step 6: Run experiments
+There are several 'run.py' scripts in subdirectories of 'experiments'.
+Each 'run.py' script will run a particular experiment from the paper.
+Experiments included are:
+single_workload: suspicious pool contains samples from 1 worm
+	apache_host
+	atphttpd
+	lion
+single_noise: suspicious pool contains samples from 1 worm, and 'noise' 
+	      innocuous requests
+	apache_host
+	atphttpd
+	lion
+mixed_workloads: suspicious pool contains multiple worm types, and noise
+	http
+
+When each experiment is run, a subdirectory will be created named after the
+current time. That directory will contain results in a format suitable for
+graphing. A file will also be created, named after the current time, with
+'.logfile' appended. This is a more human readable log of the results.

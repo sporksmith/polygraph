@@ -8,7 +8,7 @@
 #  License, Version 1.0 which can be found in the file named LICENSE.
 #  ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS SOFTWARE CONSTITUTES
 #  RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT
-import pysubseqc 
+import polygraph.util.pysubseqc as pysubseqc
 
 def lcseq(seq1, seq2, gap_penalty=.8):
     numseq1 = []

@@ -76,6 +76,9 @@ class LCSeqTree(sig_gen.SigGen):
         self.bound_similarity = bound_similarity
         self.max_tokens_in_est = max_tokens_in_est
 
+        if use_fixed_gaps:
+            raise NotImplementedError('use_fixed_gaps option is currently broken.')
+
 #        if statsfile:
 #            try:
 #                f = open(statsfile)

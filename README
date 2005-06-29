@@ -28,6 +28,26 @@ This software was written by James Newsome (jnewsome@ece.cmu.edu), in
 collaboration with Brad Karp (brad.n.karp@intel.com) and 
 Dawn Song (dawnsong@cmu.edu).
 
+
+***************************************************************************
+Overview
+***************************************************************************
+This package contains the polygraph code, in the 'polygraph' directory,
+and scripts to run the experiments in our paper, in the 'experiments' directory.
+For instructions on installing the polygraph code and running the experiments,
+see README.install.
+
+The source code for polygraph is organized as follows:
+bin			# support scripts
+pysary			# python wrapper to sary suffix array library
+pysubseq		# Smith-Waterman sequence alignment 
+sig_gen			# signature generation
+sigprob			# false positive rate estimation
+sutil			# efficient string processing
+trace_crunching		# pcap trace processing
+util			# miscellaneous
+worm_gen		# generators for (synthetic) polymorphic worms
+
 ***************************************************************************
 NOTES
 ***************************************************************************
@@ -43,19 +63,29 @@ Reason for max (5) tokens in fp estimate
 ***************************************************************************
 Known Issues
 ***************************************************************************
-lcseq_tree- use_fixed_gaps is not in a working state.
+The script for reconstructing the network streams from pcap trace files
+(polygraph/bin/reconstruct_streams) can process multiple traces, but does
+not reconstruct streams that span over multiple traces. That is, a stream
+that starts in one pcap file and finishes in the next pcap file will be
+assembled into two separate streams.
 
-when reconstructing streams, streams not allowed to continue from one
-trace to another.
-
-current noise workloads are generated using samples from eval traces.
-better practice may be to remove the samples being used for noise from the
-eval traces.
-
+In our experiments, noise workloads are generates using samples from the
+evaluation traces. That is, the streams that are used as noise in the
+suspicious pool are also used in the evaluation to measure false positives,
+possibly biasing our results to report slightly higher false positive rates.
 
 ***************************************************************************
 Suggested Extensions
 ***************************************************************************
+For token subsequence signatures, we have experimented with keeping track of 
+whether tokens always appear at a particular offset from each-other, and 
+incorporating that information into the signature. This option
+(use_fixed_gaps in sig_gen.lcseq_tree.LCSeqTree) is currently broken, but 
+would be straight-forward to get working again. This strategy can make
+the generated signatures more specific (reducing false positives), at the
+risk of making them *too* specific (increasing false negatives).
+
+
 
 ***************************************************************************
 Performance Improvements

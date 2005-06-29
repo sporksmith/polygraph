@@ -57,7 +57,7 @@ def regex_esc(s):
     return ''.join(escaped)
 
 estd_fpos_rate = {} # memoize
-def est_fpos_rate(token, trace=None):
+def est_fpos_rate(token, trace=None, stats=None):
     """
     Estimate false positive rate of a single-token signature.
     
@@ -77,15 +77,19 @@ def est_fpos_rate(token, trace=None):
 
         # use most pessimistic (highest) estimate 
         import polygraph.sigprob.tokensplit as tokensplit
-        split_prob = tokensplit.mpp(token, trace, minlen=3)[0]
-        stat_prob = tokensplit.maxcontextprob(token, trace)[0]
-        estd_fpos_rate[trace][token] = max(split_prob, stat_prob)
+        import polygraph.sigprob.sigprob as sigprob
+        if trace:
+            split_prob = tokensplit.mpp(token, trace, minlen=3)[0]
+            stat_prob = tokensplit.maxcontextprob(token, trace)[0]
+            estd_fpos_rate[trace][token] = max(split_prob, stat_prob)
+        else:
+            estd_fpos_rate[trace][token] = sigprob.token_prob(token, 1000, stats=stats)[-1]
     rv = estd_fpos_rate[trace][token]
 
     # conserve memory
     if len(token) > 20:
         del estd_fpos_rate[trace][token]
     if len(estd_fpos_rate[trace].keys()) > 200:
-        estd_fpos_rate[trace].clear()
+        estd_fpos_rate[trace].clear() # XXX should delete least recently accessed
 
     return rv

@@ -26,6 +26,7 @@ version 1.0.4
 Author: Satoru Takabayashi
 License: LGPL 
 http://sary.sourceforge.net/
+*NOTE: you need to apply the included patch!*
 
 pylibpcap: python bindings for libpcap
 version 0.4

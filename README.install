@@ -17,6 +17,7 @@ included experiments.
 Step 1: Install dependencies
 Make and install dependencies (see README.dependencies).
 NOTE: you must patch libstree using libstree-annotation.diff
+NOTE: you must patch sary using sary_next_offset.diff
 
 Step 2: Install Polygraph code
 From the polygraph subdirectory, run 'python setup.py'. Optionally,

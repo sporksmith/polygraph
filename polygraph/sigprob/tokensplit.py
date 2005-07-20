@@ -18,14 +18,14 @@ def tokenprob(token, streamfile):
     ts = sarray_trace.TraceSary(streamfile)
     return min(1, ts.token_count(token) / ts.numstreams)
 
-#    return sarray_trace.token_count(streamfile, token) / 59741
+#    return sarray_trace.token_count(streamfile, token) / ts.numstreams
 #    sary = pysary.saryer_new(streamfile)
     count = 0
     if pysary.saryer_search2(sary, token, len(token)):
         count = pysary.saryer_count_occurrences(sary)
     pysary.saryer_destroy(sary)
 
-    return min(1, count/59741)
+    return min(1, count/ts.numstreams)
 
 def split(token, stats, maxcontextlen=2):
     start = 0

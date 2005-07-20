@@ -45,7 +45,7 @@ extern gboolean        saryer_icase_search2            (Saryer *saryer,
                                                  SaryInt len);
 extern SaryText*       saryer_get_text                 (Saryer *saryer);
 extern SaryMmap*       saryer_get_array                (Saryer *saryer);
-SaryInt         saryer_get_next_offset          (Saryer *saryer);
+extern SaryInt         saryer_get_next_offset          (Saryer *saryer);
 extern gchar*          saryer_get_next_line            (Saryer *saryer);
 extern gchar*          saryer_get_next_line2           (Saryer *saryer,
                                                  SaryInt *len);

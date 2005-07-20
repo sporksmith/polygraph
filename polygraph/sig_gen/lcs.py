@@ -13,7 +13,7 @@
 import sig_gen
 import sys
 import re
-import sutil
+import polygraph.util.sutil as sutil
 
 class LCS(sig_gen.SigGen):
     def __init__(self, maxlen=1000, fname="lcs", pname="Longest Common Substring"):

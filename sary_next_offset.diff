@@ -1,0 +1,73 @@
+/*
+ *      Polygraph (release 0.1)
+ *      Signature generation algorithms for polymorphic worms
+ *
+ *      Copyright (c) 2004-2005, Intel Corporation
+ *      All Rights Reserved
+ *
+ *  This software is distributed under the terms of the Eclipse Public
+ *  License, Version 1.0 which can be found in the file named LICENSE.
+ *  ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS SOFTWARE CONSTITUTES
+ *  RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT
+ */
+
+
+diff -ur sary/saryer.c ../sary-1.0.4-custom/sary/saryer.c
+--- sary/saryer.c	2002-08-21 11:03:46.000000000 -0400
++++ ../sary-1.0.4-custom/sary/saryer.c	2005-07-07 13:05:31.000000000 -0400
+@@ -379,6 +379,32 @@
+ }
+ 
+ /**
++ * saryer_get_next_offset:
++ * @saryer: a #Saryer.
++ *
++ * Get the next search result as #SaryText. The function is useful for low-level
++ * text processing. The all results can be retrieved by calling the functions
++ * continuously.
++ *
++ * Returns: the next search result as #SaryText; NULL if no more results.
++ *
++ **/
++SaryInt
++saryer_get_next_offset (Saryer *saryer)
++{
++    SaryInt offset;
++
++    if (saryer->cursor > saryer->last) {
++	return -1;
++    }
++
++    offset = GINT_FROM_BE(*(saryer->cursor));
++    saryer->cursor++;
++
++    return offset;
++}
++
++/**
+  * saryer_get_next_line:
+  * @saryer: a #Saryer.
+  *
+diff -ur sary/saryer.h ../sary-1.0.4-custom/sary/saryer.h
+--- sary/saryer.h	2001-12-24 08:55:16.000000000 -0500
++++ ../sary-1.0.4-custom/sary/saryer.h	2004-12-17 11:54:55.000000000 -0500
+@@ -46,6 +46,7 @@
+ 						 SaryInt len);
+ SaryText*	saryer_get_text			(Saryer *saryer);
+ SaryMmap*	saryer_get_array		(Saryer *saryer);
++SaryInt         saryer_get_next_offset          (Saryer *saryer);
+ gchar*		saryer_get_next_line		(Saryer *saryer);
+ gchar*		saryer_get_next_line2		(Saryer *saryer, 
+ 						 SaryInt *len);
+Only in ../sary-1.0.4-custom/sary/: saryer.lo
+Only in ../sary-1.0.4-custom/sary/: saryer.o
+Only in ../sary-1.0.4-custom/sary/: sorter.lo
+Only in ../sary-1.0.4-custom/sary/: sorter.o
+Only in ../sary-1.0.4-custom/sary/: str.lo
+Only in ../sary-1.0.4-custom/sary/: str.o
+Only in ../sary-1.0.4-custom/sary/: text.lo
+Only in ../sary-1.0.4-custom/sary/: text.o
+Only in ../sary-1.0.4-custom/sary/: version.lo
+Only in ../sary-1.0.4-custom/sary/: version.o
+Only in ../sary-1.0.4-custom/sary/: writer.lo
+Only in ../sary-1.0.4-custom/sary/: writer.o

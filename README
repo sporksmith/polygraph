@@ -28,7 +28,6 @@ This software was written by James Newsome (jnewsome@ece.cmu.edu), in
 collaboration with Brad Karp (brad.n.karp@intel.com) and 
 Dawn Song (dawnsong@cmu.edu).
 
-
 ***************************************************************************
 Overview
 ***************************************************************************
@@ -47,18 +46,6 @@ sutil			# efficient string processing
 trace_crunching		# pcap trace processing
 util			# miscellaneous
 worm_gen		# generators for (synthetic) polymorphic worms
-
-***************************************************************************
-NOTES
-***************************************************************************
-Fixed bug in lcseq that effectively caused gap penalty to be rounded up to
-nearest integer. This means in our published results, our gap penalty
-was effectively 1.0
-
-discuss bound_similarity issues.
-(mostly right for conjunction, could be attacked for subseq)
-
-Reason for max (5) tokens in fp estimate
 
 ***************************************************************************
 Known Issues

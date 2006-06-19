@@ -15,11 +15,26 @@ This software is a test harness for the algorithms and techniques described in:
 ``Polygraph: Automatically generating signatures for polymorphic worms'' 
 
 Citation:
-James Newsome, Brad Karp, and Dawn Song. Polygraph: Automatically generating signatures for polymorphic worms. In Proceedings of the IEEE Symposium on Security and Privacy, May 2005.
+James Newsome, Brad Karp, and Dawn Song. 
+Polygraph: Automatically generating signatures for polymorphic worms. 
+In Proceedings of the IEEE Symposium on Security and Privacy, May 2005.
 
 The included software can be used to verify our results, and experiment
 with variations of our techniques. It is NOT intended to be used as a
-production system for generating worm signatures. 
+production system for generating worm signatures. We are aware of several
+attacks against these signature generation algorithms. Some of these attacks
+are described in the Polygraph paper itself, others in:
+
+James Newsome, Brad Karp, and Dawn Song.
+Paragraph: Thwarting Signature Learning by Training Maliciously.
+In Proceedings of the International Symposium on Recent Advances in 
+Intrusion Detection (RAID), September 2006.
+
+Other attacks are described in:
+Roberto Perdisci, David Dagon, Wenke Lee, Prahlad Fogla, and Monirul Sharif.
+Misleading Worm Signature Generators Using Deliberate Noise Injection.
+In Proceedings of the IEEE Symposium of the IEEE Symposium on Security
+and Privacy, May 2006.
 
 This software has been tested on Redhat 9.3, using Python 2.3.4. We are
 unable to provide help on running this software in other environments.

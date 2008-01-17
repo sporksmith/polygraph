@@ -12,83 +12,110 @@
 
 from __future__ import division
 from __future__ import generators
-import pcap
+import pcapy
+import impacket.ImpactPacket
+import impacket.ImpactDecoder
 import sys
 import string
 
-def parse_ip4(hdr, offset):
-    import struct
-    rv = {}
-    (version_plus_ihl, rv['tos'], rv['total_len'], rv['id'], flags_plus_offset, 
-     rv['ttl'], rv['protocol'], rv['chksum'], rv['src'], rv['dst']) = \
-    struct.unpack('>BBHHHBBHLL', hdr[offset:offset+20])
-    rv['version'] = version_plus_ihl >> 4
-    rv['ihl'] = version_plus_ihl & 0x0f
-    rv['flags'] = flags_plus_offset >> 13
-    rv['offset'] = flags_plus_offset & 0x1fff
-    return rv
+# def parse_ip4(hdr, offset):
+#     import struct
+#     rv = {}
+#     (version_plus_ihl, rv['tos'], rv['total_len'], rv['id'], flags_plus_offset, 
+#      rv['ttl'], rv['protocol'], rv['chksum'], rv['src'], rv['dst']) = \
+#     struct.unpack('>BBHHHBBHLL', hdr[offset:offset+20])
+#     rv['version'] = version_plus_ihl >> 4
+#     rv['ihl'] = version_plus_ihl & 0x0f
+#     rv['flags'] = flags_plus_offset >> 13
+#     rv['offset'] = flags_plus_offset & 0x1fff
+#     return rv
 
-def parse_tcp(hdr, offset):
-    import struct
-    rv = {}
-    (rv['src'], rv['dst'], rv['seq'], rv['ack_num'], offset_reserved,
-     reserved_flags, rv['window'], rv['chksum'], rv['urgent_ptr']) = \
-    struct.unpack('>HHLLBBHHH', hdr[offset:offset+20])
-    rv['offset'] = offset_reserved >> 4
-    rv['flags'] = reserved_flags & 0x3F
-    return rv
+# def parse_tcp(hdr, offset):
+#     import struct
+#     rv = {}
+#     (rv['src'], rv['dst'], rv['seq'], rv['ack_num'], offset_reserved,
+#      reserved_flags, rv['window'], rv['chksum'], rv['urgent_ptr']) = \
+#     struct.unpack('>HHLLBBHHH', hdr[offset:offset+20])
+#     rv['offset'] = offset_reserved >> 4
+#     rv['flags'] = reserved_flags & 0x3F
+#     return rv
 
-def parse_udp(hdr, offset):
-    import struct
-    rv = {}
-    (rv['src'], rv['dst'], rv['len'], rv['chksum']) = \
-    struct.unpack('>HHHH', hdr[offset:offset+8])
-    return rv
+# def parse_udp(hdr, offset):
+#     import struct
+#     rv = {}
+#     (rv['src'], rv['dst'], rv['len'], rv['chksum']) = \
+#     struct.unpack('>HHHH', hdr[offset:offset+8])
+#     return rv
 
 def _get_next_pkt(tracer, save_data):
+    # set up decoder
+    assert(tracer.datalink() == pcapy.DLT_EN10MB) #assuming ethernet
+    decoder = impacket.ImpactDecoder.EthDecoder()
+
+    # loop until we've got a process-able packet
     while True:
-        (pktlen, raw_packet, ts) = tracer.next()
-        if raw_packet == None:
+        try:
+            pkt_info, pkt = tracer.next()
+        except pcapy.PcapError:
             return None
-        offset = 14
-        ip4 = parse_ip4(raw_packet, offset)
-        assert(ip4['version'] == 4)
-        data_len = ip4['total_len'] - ip4['ihl']*4
-        offset += ip4['ihl']*4
-        if ip4['protocol'] == 6: # tcp
-            tcp = parse_tcp(raw_packet, offset)
-            offset += 4 * tcp['offset']
-            data_len -= 4 * tcp['offset'] # subtract tcp header length
-            src_port = tcp['src']
-            dst_port = tcp['dst']
-            type = "tcp"
-            if tcp['flags'] & 4:
+
+        # extract basic capture info
+        if pkt_info.getlen() != pkt_info.getcaplen():
+            print >> sys.stderr, "Warning, only captured %d of %d bytes" % (
+                pkt_info.getcaplen(), pkt_info.getlen())
+        pktlen = pkt_info.getlen()
+
+        # recontruct time stamp
+        ts_s, ts_us = pkt_info.getts()
+        ts = ts_s + (ts_us / 1.0e6)
+        
+        #        (pktlen, raw_packet, ts) = tracer.next()
+        #        if raw_packet == None:
+        #            return None
+
+        # parse the packet
+        pkt_link = decoder.decode(pkt)
+
+        # discard ethernet frame
+        pkt_net = pkt_link.child()
+
+        # skip non-IP packets
+        if not isinstance(pkt_net, impacket.ImpactPacket.IP):
+            continue
+        
+        # strip ip header
+        pkt_tport = pkt_net.child()
+        
+        if isinstance(pkt_tport, impacket.ImpactPacket.TCP):
+            src_port = pkt_tport.get_th_sport()
+            dst_port = pkt_tport.get_th_dport()
+            transport_type = "tcp"
+            if pkt_tport.get_RST():
                 status = "rst"
-            elif tcp['flags'] & 1:
+            elif pkt_tport.get_FIN():
                 status = "fin"
             else:
                 status = "open"
-        elif ip4['protocol'] == 17: # udp
-            udp = parse_udp(raw_packet, offset)
-            data_len -= 8 # subtract udp header length
-            src_port = udp['src']
-            dst_port = udp['dst']
-            type = "udp"
+        elif isinstance(pkt_tport, impacket.ImpactPacket.UDP):
+            src_port = pkt_tport.get_uh_sport()
+            dst_port = pkt_tport.get_uh_dport()
+            transport_type = "udp"
             status = "udp"
         else: # not tcp or udp, grab the next packet instead
             continue
         break # got a tcp or udp packet, process and return
 
     # src ip, dst ip, src port, dst port
-    connection = (ip4['src'], ip4['dst'], src_port, dst_port)
+    connection = (pkt_net.get_ip_src(), pkt_net.get_ip_dst(),
+                  src_port, dst_port)
     pkt = {"connection": connection,
             "ts": [ts],
-            "type": type,
+            "type": transport_type,
             "status": status,
             "pkts": 1}
 
     if save_data:
-        pkt["data"] = list(raw_packet[offset:offset+data_len])
+        pkt["data"] = list(pkt_tport.get_data_as_string())
     else:
         pkt["data"] = []
 
@@ -103,6 +130,8 @@ def print_stream(stream):
     print "Packet Count: ",
     print stream["pkts"]
     print "Data:\n" + stream["data"].__repr__()
+    print
+    
 #    print_stream.count -= 1
 #    if print_stream.count <= 0:
 #        raise IndexError
@@ -131,11 +160,10 @@ def process_trace(trace_name, callback=print_stream, timeout=2000, filter=None,
 
     streams = [] # stream q - most recent at 0
     now = 0          # current time
-    tracer = pcap.pcapObject() # libpcap trace object
+    tracer = pcapy.open_offline(trace_name)
 
-    tracer.open_offline(trace_name)
     if filter:
-        tracer.setfilter(filter, True, 0xffffff00L)
+        tracer.setfilter(filter)
 
     while(True):
         pkt = _get_next_pkt(tracer, save_data)
